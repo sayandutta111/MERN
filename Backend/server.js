@@ -2,11 +2,20 @@
 const express = require("express"),
   bodyParser = require("body-parser"),
   cors = require("cors"),
-  mongoose = require("mongoose");
+  mongoose = require("mongoose"),
+  dotenv = require("dotenv");
+
+// Load environment variables from .env file
+dotenv.config();
 
 // MongoDB Cluster URL
-var mongoDatabase =
-  "mongodb+srv://sayan1996:sayan1234@cluster0.mfbg1.mongodb.net/employeeDetails?retryWrites=true&w=majority";
+const mongoDatabase = process.env.DATABASEURI;
+
+// Ensure the database URI is defined
+if (!mongoDatabase) {
+  console.error("DATABASEURI is not defined in the environment variables.");
+  process.exit(1);
+}
 
 // Created express server
 const app = express();
@@ -21,7 +30,7 @@ mongoose
     },
     (err) => {
       console.error(
-        "There is a problem while connecting to the database " + err
+        "There is a problem while connecting to the database: " + err
       );
     }
   );
@@ -40,6 +49,12 @@ const port = process.env.PORT || 4000;
 
 // Routes Configuration
 app.use("/employees", employeeRoutes);
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
 
 // Starting our express server
 app.listen(port, () => {
