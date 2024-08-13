@@ -1,4 +1,5 @@
 import axios from "axios";
+import debounce from "lodash.debounce";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
@@ -27,7 +28,6 @@ const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Get employee details based on ID
   useEffect(() => {
     const getEmployeeById = async () => {
       try {
@@ -84,16 +84,27 @@ const EditEmployee = () => {
     return valid;
   };
 
-  // Handle input changes
+  // Debounced validation
+  const debouncedValidate = debounce((formData) => {
+    validate(formData);
+  }, 300);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    // Debounced validation
+    debouncedValidate({ ...formData, [name]: value });
   };
 
-  // Handle form submission
+  const handleBlur = (event) => {
+    const { name, value } = event.target;
+    validate({ ...formData, [name]: value });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (validate()) {
@@ -129,6 +140,7 @@ const EditEmployee = () => {
             type="text"
             value={formData.firstName}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.firstName && (
@@ -143,6 +155,7 @@ const EditEmployee = () => {
             type="text"
             value={formData.lastName}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.lastName && (
@@ -157,6 +170,7 @@ const EditEmployee = () => {
             type="text"
             value={formData.email}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.email && <div className="text-danger">{errors.email}</div>}
@@ -169,6 +183,7 @@ const EditEmployee = () => {
             type="text"
             value={formData.phone}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.phone && <div className="text-danger">{errors.phone}</div>}

@@ -1,7 +1,9 @@
 import axios from "axios";
+import debounce from "lodash.debounce";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+
 const customStyle = {
   width: "300px",
   margin: "0 auto",
@@ -25,29 +27,29 @@ const AddEmployee = () => {
 
   const navigate = useNavigate();
 
-  const validate = () => {
+  const validate = (newFormData) => {
     let valid = true;
     const newErrors = {};
 
-    if (!formData.firstName) {
+    if (!newFormData.firstName) {
       newErrors.firstName = "First name is required";
       valid = false;
     }
-    if (!formData.lastName) {
+    if (!newFormData.lastName) {
       newErrors.lastName = "Last name is required";
       valid = false;
     }
-    if (!formData.email) {
+    if (!newFormData.email) {
       newErrors.email = "Email is required";
       valid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(newFormData.email)) {
       newErrors.email = "Email is invalid";
       valid = false;
     }
-    if (!formData.phone) {
+    if (!newFormData.phone) {
       newErrors.phone = "Phone number is required";
       valid = false;
-    } else if (!/^\d+$/.test(formData.phone)) {
+    } else if (!/^\d+$/.test(newFormData.phone)) {
       newErrors.phone = "Phone number is invalid";
       valid = false;
     }
@@ -58,15 +60,24 @@ const AddEmployee = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const updatedFormData = { ...formData, [name]: value };
+
+    setFormData(updatedFormData);
+
+    // Debounced validation
+    debouncedValidate(updatedFormData);
+  };
+
+  const handleBlur = (event) => {
+    const { name, value } = event.target;
+    const updatedFormData = { ...formData, [name]: value };
+
+    validate(updatedFormData);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validate()) {
+    if (validate(formData)) {
       axios
         .post("http://localhost:4000/employees/addEmployee", formData)
         .then((response) => {
@@ -76,6 +87,7 @@ const AddEmployee = () => {
               hideProgressBar: true,
               autoDismiss: true,
             });
+            navigate("/");
           } else {
             addToast("Something went wrong!", {
               appearance: "error",
@@ -83,13 +95,21 @@ const AddEmployee = () => {
               autoDismiss: true,
             });
           }
-          navigate("/");
         })
         .catch((error) => {
+          addToast("Error occurred while adding employee.", {
+            appearance: "error",
+            hideProgressBar: true,
+            autoDismiss: true,
+          });
           console.log(error);
         });
     }
   };
+
+  const debouncedValidate = debounce((formData) => {
+    validate(formData);
+  }, 300);
 
   return (
     <div className="container">
@@ -101,6 +121,7 @@ const AddEmployee = () => {
             type="text"
             value={formData.firstName}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.firstName && (
@@ -115,6 +136,7 @@ const AddEmployee = () => {
             type="text"
             value={formData.lastName}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.lastName && (
@@ -129,6 +151,7 @@ const AddEmployee = () => {
             type="text"
             value={formData.email}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.email && <div className="text-danger">{errors.email}</div>}
@@ -141,6 +164,7 @@ const AddEmployee = () => {
             type="text"
             value={formData.phone}
             onChange={handleChange}
+            onBlur={handleBlur}
             className="form-control"
           />
           {errors.phone && <div className="text-danger">{errors.phone}</div>}
