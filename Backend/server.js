@@ -23,17 +23,15 @@ mongoose.Promise = global.Promise;
 
 // Connect MongoDB Database
 mongoose
-  .connect(mongoDatabase, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(
-    () => {
-      console.log("Database is connected");
-    },
-    (err) => {
-      console.error(
-        "There is a problem while connecting to the database: " + err
-      );
-    }
-  );
+  .connect(mongoDatabase)
+  .then(() => {
+    console.log("Database is connected");
+  })
+  .catch((err) => {
+    console.error(
+      "There is a problem while connecting to the database: " + err
+    );
+  });
 
 // All the express routes
 const employeeRoutes = require("./Routes/Employee.route");
