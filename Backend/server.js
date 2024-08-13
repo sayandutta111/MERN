@@ -19,7 +19,6 @@ if (!mongoDatabase) {
 
 // Created express server
 const app = express();
-mongoose.Promise = global.Promise;
 
 // Connect MongoDB Database
 mongoose
