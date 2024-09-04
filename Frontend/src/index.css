@@ -43,19 +43,23 @@ code {
 }
 /* Form Styling */
 .container {
-  margin-top: 50px;
+  margin-top: 15px;
+  margin-bottom: 20px;
 }
 
 form {
-  background-color: #f9f9f9;
+  /* background-color: #f9f9f9; */
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 12222;
+  background-image: url("./Images/banner.jpg");
 }
 
 label {
   display: block;
   margin-bottom: 0px;
+  font-size: large;
 }
 .bordered-table {
   border-collapse: collapse;
@@ -66,6 +70,8 @@ label {
 .bordered-table td {
   border: 1px solid #ddd;
   padding: 8px;
+  font-size: large;
+  font-weight: 700;
 }
 
 .bordered-table th {
@@ -73,8 +79,8 @@ label {
   text-align: left;
 }
 .text-danger {
-  color: red;
-  font-size: 0.875em;
+  color: rgb(136, 3, 3);
+  font-size: 1em;
 }
 
 input[type="text"] {
@@ -92,7 +98,7 @@ input[type="submit"] {
   background-color: #4caf50;
   color: white;
   padding: 10px 15px;
-  margin: 5px 0;
+  margin: 15px 0;
   border: none;
   border-radius: 4px;
   cursor: pointer;
